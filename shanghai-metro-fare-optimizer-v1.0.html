@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#123d35">
+  <meta name="description" content="上海地铁新旧票价和计次票费用对照，计算你的通勤最优方案。纯本地、免登录。">
+  <title>通勤省钱计算器 · 上海地铁</title>
+  <style>
+/* 由原微信小程序样式移植；375px 手机屏宽按 1rpx≈0.5px 转换。 */
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; background: #e8efea; color: #152d2b; font-size: 14px; font-family: -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; }
+button, input { font: inherit; }
+button { cursor: pointer; touch-action: manipulation; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #48b48d; outline-offset: 3px; }
+.page-wrap, .rules-page { max-width: 540px; margin: 0 auto; background: #f6f8f7; min-height: 100dvh; box-shadow: 0 6px 36px rgba(25,61,46,.09); }
+.is-hidden { display: none !important; }
+body:has(#rulesPage:not(.is-hidden)) { background: #f6f8f7; }
+.page-wrap { min-height: 100vh; padding-bottom: 40px; }
+.hero { background: #123d35; color: #fff; padding: 23px 20px 26px; border-radius: 0 0 21px 21px; }
+.hero-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 19px; }
+.tag { display: inline-flex; align-items: center; font-size: 10px; letter-spacing: 1px; color: #b6d2c5; font-weight: 600; }
+.tag-dot { width: 6px; height: 6px; background: #91d9ad; border-radius: 100%; margin-right: 7px; }
+.hero-icon { height: 27px; width: 27px; border: 1px solid #759e91; display: flex; align-items: center; justify-content: center; font-size: 14px; border-radius: 8.5px; font-weight: 800; color: #a7d0b8; }
+.hero-title { font-size: 26.5px; font-weight: 750; line-height: 1.34; letter-spacing: -0.75px; }
+.hero-title span { color: #8de3ae; }
+.hero-description { color: #d1e2da; font-size: 12.5px; margin-top: 9px; }
+.hero-note { font-size: 10px; color: #8bbaaa; margin-top: 18px; }
+.main-content { padding: 14px 14px 0; }
+.section-label { display: flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 750; margin: 18px 0 9px; color: #193a34; }
+.section-label span { color: #168566; font-size: 10.5px; font-weight: 800; font-style: italic; }
+.panel { background: #fff; border: 0.5px solid #e5ece8; border-radius: 15px; padding: 14.5px 14px; box-shadow: 0 3px 14px rgba(25,61,46,.035); }
+.fare-heading { display: flex; align-items: baseline; justify-content: space-between; font-size: 13.5px; font-weight: 700; margin-bottom: 10px; }
+.hint { font-size: 11px; font-weight: 400; color: #8c9a94; }
+.fare-grid { display: flex; gap: 8px; }
+.fare-tile { flex: 1; background: #f4f6f5; border-radius: 11.5px; padding: 11px 11px 9px; min-width: 0; }
+.new-fare { background: #edf7f1; }
+.fare-kicker { font-size: 10.5px; color: #73837c; min-height: 14.5px; }
+.new-fare .fare-kicker { color: #238060; }
+.fare-number { font-size: 19px; font-weight: 750; margin: 5px 0 8px; }
+.fare-number span { font-size: 28.5px; }
+.stepper { display: flex; align-items: center; justify-content: space-around; background: #fff; height: 30px; border-radius: 8px; }
+.step-btn { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 18.5px; line-height: 1; padding-bottom: 2px; color: #184c3a; }
+.step-divider { height: 14.5px; width: 0.5px; background: #e2eae5; }
+.input-divider, .thin-divider { height: 0.5px; background: #eaf0eb; margin: 15px 0; }
+.range-heading { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 650; }
+.range-value { font-size: 18px; font-weight: 760; color: #197856; }
+.range-value span { font-size: 11px; font-weight: 400; }
+.input-panel input[type="range"] { margin: 4px 4px 0; }
+.range-meta { display: flex; justify-content: space-between; color: #98a5a0; font-size: 9.5px; padding: 0 2.5px; }
+.second-range { margin-top: 15px; }
+.rides-strip { display: flex; align-items: center; justify-content: space-between; background: #f0f5f1; margin-top: 13px; border-radius: 9px; padding: 10px; font-size: 10.5px; color: #6b8279; }
+.rides-total { font-size: 11px; color: #1f5140; font-weight: 600; }
+.rides-total span { font-size: 16px; font-weight: 800; }
+.recommendation { background: #dff5e8; border: 0.5px solid #bee6cd; border-radius: 15px; padding: 15px 15px 12px; }
+.recommendation-top { display: flex; align-items: center; justify-content: space-between; }
+.recommendation-badge { font-size: 10.5px; color: #196544; font-weight: 750; }
+.recommendation-star { font-size: 10px; color: #3c8d65; }
+.recommendation-title { font-size: 18.5px; font-weight: 800; color: #174c35; margin-top: 14px; }
+.recommendation-money { font-size: 31px; font-weight: 800; color: #0f4f36; margin-top: 2.5px; letter-spacing: -0.5px; }
+.recommendation-money span { font-size: 11px; font-weight: 400; color: #58916f; letter-spacing: 0; }
+.recommendation-explain { color: #538467; font-size: 10px; margin-top: 4.5px; }
+.recommendation-divider { height: 0.5px; background: #b9e1c8; margin: 12.5px 0; }
+.recommendation-metrics { display: flex; }
+.recommendation-metric { flex: 1; min-width: 0; }
+.metric-border { width: 0.5px; background: #b9dfc7; margin: 0 11px; }
+.metric-label { font-size: 10px; color: #4e8568; }
+.metric-value { font-size: 17.5px; font-weight: 790; margin-top: 3.5px; color: #098258; }
+.metric-value.dark { color: #2c5848; }
+.comparison-intro { color: #77867d; font-size: 11.5px; margin-bottom: 13.5px; }
+.chart-row { margin-bottom: 11.5px; }
+.chart-row-top { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; margin-bottom: 5.5px; color: #51665c; }
+.bar-amount { font-weight: 750; color: #1c3930; font-size: 12.5px; }
+.bar-track { height: 9px; border-radius: 6px; background: #eff3ef; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 6px; }
+.bar-fill.gray { background: #a7b5ab; }
+.bar-fill.orange { background: #e0a57b; }
+.bar-fill.green { background: #168c64; }
+.difference-grid { display: grid; grid-template-columns: 1fr 1fr; row-gap: 14px; column-gap: 8px; }
+.difference-name { color: #7c8c83; font-size: 10.5px; }
+.difference-number { font-size: 17.5px; font-weight: 760; color: #244c3d; margin-top: 3px; }
+.difference-number.small { font-size: 15.5px; }
+.plan-panel, .sensitivity-panel { padding-top: 0; padding-bottom: 0; }
+.plan-head { display: flex; justify-content: space-between; font-size: 10.5px; color: #87968d; padding: 13.5px 0 8px; border-bottom: 0.5px solid #edf1ed; }
+.plan-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid #eff2ef; padding: 11.5px 0; gap: 6px; }
+.plan-row:last-child { border: none; }
+.plan-left { flex: 1; min-width: 0; }
+.plan-right { text-align: right; flex-shrink: 0; }
+.plan-name { display: flex; align-items: center; font-size: 13px; font-weight: 650; gap: 5px; }
+.plan-detail { color: #99a49d; margin-top: 3.5px; font-size: 9.5px; }
+.plan-cost { font-size: 13.5px; color: #2b4238; font-weight: 750; }
+.plan-comparison { color: #87968e; font-size: 9.5px; margin-top: 3.5px; }
+.selected-plan .plan-cost, .selected-plan .plan-name { color: #147b53; }
+.best-chip { background: #ddf3e5; color: #167f57; font-size: 9px; border-radius: 4px; padding: 2px 4.5px; font-weight: 750; }
+.sensitivity-head, .sensitivity-row { display: grid; grid-template-columns: 1fr 1.25fr 1fr; align-items: center; }
+.sensitivity-head { color: #91a096; font-size: 10px; padding: 13px 0 8.5px; border-bottom: 0.5px solid #e9eeea; }
+.sensitivity-head span:last-child { text-align: right; }
+.sensitivity-row { font-size: 11px; border-bottom: 0.5px solid #edf1ed; padding: 10px 0; }
+.current-row { background: #eef8f1; margin: 0 -7px; padding: 10px 7px; border-radius: 6px; }
+.sensitivity-days { font-weight: 730; }
+.sensitivity-days span { color: #17885d; background: #ddf3e5; font-size: 8px; margin-left: 4px; padding: 1.5px 3px; border-radius: 3px; }
+.sensitivity-plan { color: #68786f; }
+.sensitivity-cost { text-align: right; font-weight: 750; }
+.sensitivity-note { color: #a3ada5; font-size: 9.5px; padding: 11px 0 13px; }
+.assumption-note { background: #ecf0ed; border-radius: 9.5px; margin-top: 13px; padding: 11.5px; display: flex; align-items: flex-start; gap: 7.5px; }
+.warning-symbol { width: 17px; height: 17px; font-size: 11px; background: #b5c6bb; color: #fff; border-radius: 100%; text-align: center; line-height: 17px; font-weight: 750; flex-shrink: 0; }
+.assumption-copy { font-size: 10px; color: #667970; line-height: 1.7; flex: 1; }
+.assumption-copy span { font-weight: 750; }
+.action-row { display: flex; gap: 8px; margin-top: 16px; }
+.primary-button, .secondary-button { height: 43.5px; line-height: 43.5px; border-radius: 8.5px; font-size: 12px; font-weight: 700; }
+.primary-button { flex: 1.3; color: #fff; background: #145d45; }
+.secondary-button { flex: .9; color: #22614a; border: 0.5px solid #d4e2d8; background: #fff; }
+.footer-links { display: flex; justify-content: center; align-items: center; color: #427e61; font-size: 11px; margin-top: 16px; gap: 9.5px; }
+.footer-separator { color: #a2b4aa; }
+.footer-copyright { margin-top: 14.5px; text-align: center; color: #a1afa5; font-size: 8.5px; letter-spacing: 0.6px; }
+
+.rules-page { min-height: 100vh; background: #f6f8f7; padding-bottom: 30px; }
+.rules-hero { background: #143d34; color: #fff; padding: 28px 17px 24.5px; border-radius: 0 0 17.5px 17.5px; }
+.rules-eyebrow { color: #a4c7b5; font-size: 9.5px; letter-spacing: 1.5px; font-weight: 650; }
+.rules-title { margin-top: 11.5px; font-size: 21px; font-weight: 760; }
+.rules-title span { color: #8de3ae; }
+.rules-subtitle { margin-top: 6.5px; color: #bfd5c8; font-size: 11.5px; }
+.rules-body { padding: 12.5px; }
+.rules-card { background: #fff; border: 0.5px solid #e7eee9; border-radius: 12px; padding: 15px; margin-bottom: 10.5px; }
+.card-title { font-size: 14px; font-weight: 760; color: #1d4f3c; margin-bottom: 10px; }
+.paragraph { font-size: 11.5px; color: #53665b; line-height: 1.75; margin: 7px 0; }
+.equation { border-left: 3px solid #3ba178; background: #edf7ef; color: #266b4d; border-radius: 3.5px; padding: 10px; margin: 11px 0; font-size: 11.5px; line-height: 1.6; }
+.source-row { display: flex; align-items: center; justify-content: space-between; border-top: 0.5px solid #ebf0eb; padding: 10.5px 0; gap: 7.5px; }
+.source-title { font-size: 11px; line-height: 1.5; color: #304d3d; flex: 1; }
+.source-action { white-space: nowrap; color: #19835c; font-size: 9.5px; }
+.disclaimer { color: #97a59a; text-align: center; padding: 12px; font-size: 9.5px; line-height: 1.6; }
+
+/* Web-specific interactive adaptation. */
+.page-wrap { padding-bottom: max(40px,env(safe-area-inset-bottom)); }
+.hero { padding-top: max(23px,calc(env(safe-area-inset-top) + 20px)); }
+.input-panel input[type="range"] { display:block; width: calc(100% - 8px); height: 30px; margin: 4px 4px 0; accent-color: #168566; cursor: pointer; }
+.step-btn { border:0; background:transparent; min-height:30px; line-height:1; padding:0; -webkit-appearance:none; }
+.step-btn:disabled { color:#b1bdb5; cursor:not-allowed; }
+.action-row { align-items: stretch; }
+.primary-button, .secondary-button { display:flex; align-items:center; justify-content:center; line-height:1.25; padding:8px 10px; text-align:center; min-width:0; }
+.primary-button { border: 1px solid #145d45; }
+.secondary-button { border: 1px solid #d4e2d8; }
+#bestCostLabel { font-size: inherit; font-weight: inherit; color: inherit; letter-spacing: inherit; }
+.footer-links button { border:0; background:none; color:inherit; padding:4px; font-size:inherit; }
+.footer-links button:hover, a:hover { text-decoration:underline; }
+.footer-links { flex-wrap:wrap; }
+.rules-back-wrap { margin:0 auto; max-width:540px; padding:16px 20px 0; background:#f6f8f7; }
+.back-button { display:inline-flex; align-items:center; gap:8px; background:transparent; border:0; color:#166649; padding:8px 3px; font-size:14px; font-weight:650; }
+.source-row { width:100%; color:inherit; text-align:left; border-left:0; border-right:0; border-bottom:0; background:transparent; cursor:pointer; }
+.source-row:focus-visible { outline-offset:0; }
+.source-action { font-weight:650; }
+.rules-hero { padding-top:25px; }
+.toast { position:fixed; z-index:100; left:50%; transform:translateX(-50%); bottom:max(22px,env(safe-area-inset-bottom)); background:#183b31; color:white; border-radius:100px; padding:10px 18px; font-size:13px; box-shadow:0 8px 28px rgba(0,0,0,.2); max-width:min(90vw,500px); text-align:center; }
+.offline-note { background:#eaf3ed; border:1px solid #d5e7da; border-radius:12px; padding:10px 12px; font-size:11px; line-height:1.6; color:#557265; margin-top:15px; }
+.footer-copyright { line-height:1.6; }
+@media (min-width: 600px) { .page-wrap,.rules-page { margin:18px auto; border-radius:24px; overflow:hidden; min-height:calc(100dvh - 36px); } .rules-back-wrap { margin:18px auto -18px; border-radius:18px 18px 0 0; } }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+  </style>
+</head>
+<body>
+<div id="homePage" class="page-wrap">
+  <header class="hero">
+    <div class="hero-top">
+      <div class="tag"><div class="tag-dot"></div>SHANGHAI METRO · 2026</div>
+      <div class="hero-icon" aria-label="轨道交通">M</div>
+    </div>
+    <div class="hero-title">每次通勤，<span>花得更聪明。</span></div>
+    <div class="hero-description">新旧票价对照 · 自动挑选划算套餐</div>
+    <div class="hero-note">12 月 1 日新规 · 无需登录 · 数据仅留在本机</div>
+  </header>
+  <main class="main-content">
+    <div class="section-label"><span>01</span> 设置通勤情境</div>
+    <section class="panel input-panel" aria-label="设置通勤情境">
+      <div class="fare-heading">单程票价<span class="hint">元 / 次</span></div>
+      <div class="fare-grid">
+        <div class="fare-tile">
+          <div class="fare-kicker">调整前</div>
+          <div class="fare-number">¥<span id="oldFare">4</span></div>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-fare="oldFare" data-delta="-1" aria-label="调低旧票价">−</button>
+            <div class="step-divider"></div>
+            <button type="button" class="step-btn" data-fare="oldFare" data-delta="1" aria-label="调高旧票价">＋</button>
+          </div>
+        </div>
+        <div class="fare-tile new-fare">
+          <div class="fare-kicker">调整后 · 12/01 起</div>
+          <div class="fare-number">¥<span id="newFare">6</span></div>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-fare="newFare" data-delta="-1" aria-label="调低新票价">−</button>
+            <div class="step-divider"></div>
+            <button type="button" class="step-btn" data-fare="newFare" data-delta="1" aria-label="调高新票价">＋</button>
+          </div>
+        </div>
+      </div>
+      <div class="input-divider"></div>
+      <div class="range-heading"><label for="workdays">每月通勤工作日</label><div class="range-value"><span id="workdaysValue">21</span> <span>天</span></div></div>
+      <input id="workdays" type="range" min="0" max="31" step="1" value="21" aria-label="每月通勤工作日">
+      <div class="range-meta"><span>0 天</span><span>31 天</span></div>
+      <div class="range-heading second-range"><label for="extraRides">额外乘车次数</label><div class="range-value"><span id="extraRidesValue">0</span> <span>次</span></div></div>
+      <input id="extraRides" type="range" min="0" max="44" step="1" value="0" aria-label="额外乘车次数">
+      <div class="range-meta"><span>0 次</span><span>44 次</span></div>
+      <div class="rides-strip"><span>每个工作日往返 2 次</span><div class="rides-total">预计共 <span id="rides">42</span> 次</div></div>
+    </section>
+
+    <div class="section-label"><span>02</span> 为你推荐</div>
+    <section class="recommendation" aria-label="最优推荐">
+      <div class="recommendation-top"><span class="recommendation-badge">最低预估费用</span><span class="recommendation-star">✦ 优选</span></div>
+      <div class="recommendation-title" id="bestTitle">45 次票</div>
+      <div class="recommendation-money"><span id="bestCostLabel">¥210.00</span><span> / 模拟周期</span></div>
+      <div class="recommendation-explain" id="bestExplanation"></div>
+      <div class="recommendation-divider"></div>
+      <div class="recommendation-metrics">
+        <div class="recommendation-metric"><div class="metric-label">对比新制直接刷码省</div><div class="metric-value" id="savedLabel">¥25.80</div></div>
+        <div class="metric-border"></div>
+        <div class="recommendation-metric"><div class="metric-label">对比旧制支出变化</div><div class="metric-value dark" id="deltaLabel">+¥51.60</div></div>
+      </div>
+    </section>
+
+    <div class="section-label"><span>03</span> 新旧制度的真实差异</div>
+    <section class="panel comparison-panel">
+      <div class="comparison-intro">相同乘坐次数，三种支出方式</div>
+      <div id="barRows"></div>
+      <div class="thin-divider"></div>
+      <div class="difference-grid">
+        <div><div class="difference-name">新制有效涨幅</div><div class="difference-number" id="deltaPct">+32.6%</div></div>
+        <div><div class="difference-name">优惠抵消原本涨幅</div><div class="difference-number" id="offsetPct">33.3%</div></div>
+        <div><div class="difference-name">旧制平均每次</div><div class="difference-number small">¥<span id="oldPerRide">3.77</span></div></div>
+        <div><div class="difference-name">优化后平均每次</div><div class="difference-number small">¥<span id="newPerRide">5.00</span></div></div>
+      </div>
+    </section>
+
+    <div class="section-label"><span>04</span> 各种方案怎么选</div>
+    <section class="panel plan-panel">
+      <div class="plan-head"><span>方案</span><span>预估总费用</span></div>
+      <div id="plans"></div>
+    </section>
+
+    <div class="assumption-note"><span class="warning-symbol">i</span><div class="assumption-copy"><strong>重要假设</strong>：按单个自然月测算，假设计次票在有效期内覆盖所有乘次。计次票自激活日起按官方规定计算有效期，而 9 折优惠每自然月重置；跨月、出差、混合票价及换乘情景仅供参考。</div></div>
+    <div class="action-row">
+      <button type="button" class="primary-button" id="copySummary">复制我的测算结果</button>
+      <button type="button" class="secondary-button" id="shareWeb">分享网页</button>
+    </div>
+    <div class="footer-links"><button type="button" id="openRules">模型说明与政策来源 ›</button><span class="footer-separator">·</span><button type="button" id="reset">恢复默认</button></div>
+    <div class="footer-copyright">METRO MATH / WEB EDITION · V1.1</div>
+    <div class="offline-note">本 HTML 可离线打开。要让朋友通过微信链接访问，需要先把这个文件上传到网页托管服务；仅转发本地文件路径无法让朋友打开。</div>
+  </main>
+</div>
+
+<div id="rulesPage" class="rules-page is-hidden">
+  <div class="rules-back-wrap"><button type="button" class="back-button" id="backHome">← 返回计算器</button></div>
+  <header class="rules-hero">
+    <div class="rules-eyebrow">BEHIND THE NUMBERS</div>
+    <div class="rules-title">每个数字，<span>都算得清楚。</span></div>
+    <div class="rules-subtitle">方法说明、适用边界与政策出处</div>
+  </header>
+  <main class="rules-body">
+    <section class="rules-card">
+      <div class="card-title">01 / 现行与新制的普通票</div>
+      <div class="paragraph">现行制度按同一适用支付渠道、自然月累计满 70 元后，后续轨道交通票价享 9 折。2026 年 12 月 1 日起，新制度门槛调整为 90 元，后续票价享 9 折。</div>
+      <div class="equation">普通成本 = 全价乘次 × 单价 + 折扣乘次 × 单价 × 0.9</div>
+      <div class="paragraph">程序以整数“分”计算；跨过门槛的那一次仍按全价，下次才享折扣。旧制与新制均假设用户的支付渠道符合相应优惠条件。</div>
+    </section>
+    <section class="rules-card">
+      <div class="card-title">02 / 计次票模型</div>
+      <div class="paragraph">35 次 190 元、45 次 210 元、60 次 270 元、90 次 390 元。对每一种套餐，计算“套票金额 + 超额乘次的普通票费用”，与“不买套票”进行比较，选择支出最低者。</div>
+      <div class="equation">最优成本 = min(普通票费用, 各档套票费用 + 超额普通票费用)</div>
+      <div class="paragraph">计次票不与满额 9 折叠加。模型只比较单张计次票；如果价格相同，优先选择未使用额度更少的方案。</div>
+    </section>
+    <section class="rules-card">
+      <div class="card-title">03 / 必须知道的限制</div>
+      <div class="paragraph">本版是“单个自然月情境估算器”，不是购票系统。以下情况暂未纳入精确排程：计次票在激活日起的实际有效期、跨自然月的满额清零、每日多段不同里程与不同票价、公交换乘、出差假期、电子支付渠道补贴、跨周期连续购买多张套餐。</div>
+      <div class="paragraph">计次票的实际有效期、退票政策与可用线路，请以申通地铁正式购票页面为准。模型不售票，不登录账户，不传输乘车数据。</div>
+    </section>
+    <section class="rules-card">
+      <div class="card-title">04 / 数据与隐私</div>
+      <div class="paragraph">所有运算都在浏览器本地执行；保存的只是你输入的票价、工作天数与额外乘次。点击首页“恢复默认”即可覆盖这些本地参数。本版没有服务器、云数据库、定位、广告或身份识别。</div>
+    </section>
+    <section class="rules-card">
+      <div class="card-title">05 / 政策资料</div>
+      <div class="paragraph">资料来自原始小程序工程。正式公开前建议再次核对链接和最新乘客使用规则。</div>
+      <a class="source-row" href="https://fgw.sh.gov.cn/fgw_jjjctk/20261123/f57b63885c514c829ee269ed589ab2b9.html" target="_blank" rel="noopener noreferrer"><span class="source-title">上海市发展改革委：新票价机制正式复函</span><span class="source-action">查看 ↗</span></a>
+      <a class="source-row" href="https://www.shmetro.com" target="_blank" rel="noopener noreferrer"><span class="source-title">上海地铁：计次票与乘客优惠规则</span><span class="source-action">查看 ↗</span></a>
+      <a class="source-row" href="https://www.xinhuanet.com/20261123/a4ce9cbab7054903926812ab28ab3f0f/c.html" target="_blank" rel="noopener noreferrer"><span class="source-title">新华社：2026 年 11 月 23 日票价报道</span><span class="source-action">查看 ↗</span></a>
+    </section>
+    <div class="disclaimer">非上海地铁官方产品。费用仅供个人决策参考，不代表实际扣费承诺。</div>
+  </main>
+</div>
+<div id="toast" role="status" aria-live="polite" class="toast is-hidden"></div>
+<script>
+'use strict';
+// Math model ported from utils/fare.js in the original WeChat Mini Program.
+// Integer cents are used to avoid common JS floating point display errors.
+const POLICY = Object.freeze({
+  oldThresholdYuan: 70,
+  newThresholdYuan: 90,
+  discount: 0.9,
+  effectiveDate: '2026-12-01',
+  passes: [
+    {id:'pass35',title:'35 次票',rides:35,priceYuan:190},
+    {id:'pass45',title:'45 次票',rides:45,priceYuan:210},
+    {id:'pass60',title:'60 次票',rides:60,priceYuan:270},
+    {id:'pass90',title:'90 次票',rides:90,priceYuan:390}
+  ]
+});
+const DEFAULT_SETTINGS = Object.freeze({ oldFare:4,newFare:6,workdays:21,extraRides:0 });
+const STORAGE_KEY = 'metro_optimizer_html_v1';
+const $ = id => document.getElementById(id);
+const money = cents => '¥'+(Math.round(cents)/100).toFixed(2);
+function clampInteger(v,min,max,fallback){const n=Number(v);return Number.isFinite(n)?Math.max(min,Math.min(max,Math.round(n))):fallback;}
+function regularCostCents(rides,fareYuan,thresholdYuan,discount=POLICY.discount){
+  if(!Number.isSafeInteger(rides)||rides<0)throw new RangeError('乘次必须为非负整数');
+  if(!Number.isFinite(fareYuan)||fareYuan<0)throw new RangeError('票价无效');
+  const fare=Math.round(fareYuan*100), threshold=Math.round(thresholdYuan*100);
+  if(fare===0)return 0;
+  const fullRides=Math.min(rides,Math.ceil(threshold/fare));
+  return fullRides*fare+(rides-fullRides)*Math.round(fare*discount);
+}
+function comparePlans({rides,oldFareYuan,newFareYuan}){
+  const oldCents=regularCostCents(rides,oldFareYuan,POLICY.oldThresholdYuan);
+  const newRegularCents=regularCostCents(rides,newFareYuan,POLICY.newThresholdYuan);
+  const plans=[{id:'regular',title:'普通刷码',totalCents:newRegularCents,isPass:false,unusedRides:0,extraRides:rides,ridesUsed:0,passPriceCents:0}];
+  for(const pass of POLICY.passes){
+    const extra=Math.max(0,rides-pass.rides);
+    plans.push({id:pass.id,title:pass.title,totalCents:Math.round(pass.priceYuan*100)+regularCostCents(extra,newFareYuan,POLICY.newThresholdYuan),isPass:true,ridesUsed:Math.min(pass.rides,rides),unusedRides:Math.max(0,pass.rides-rides),extraRides:extra,passPriceCents:Math.round(pass.priceYuan*100)});
+  }
+  const ranked=plans.slice().sort((a,b)=>a.totalCents-b.totalCents||a.unusedRides-b.unusedRides||a.passPriceCents-b.passPriceCents);
+  const best=ranked[0];
+  const increaseCents=best.totalCents-oldCents;
+  const avoidedIncreaseCents=newRegularCents-best.totalCents;
+  const rawIncreaseCents=newRegularCents-oldCents;
+  return {oldCents,newRegularCents,plans,best,increaseCents,avoidedIncreaseCents,
+    increasePct:oldCents>0?increaseCents/oldCents*100:0,
+    offsetPct:rawIncreaseCents>0?avoidedIncreaseCents/rawIncreaseCents*100:null,
+    oldPerRide:rides?(oldCents/rides/100).toFixed(2):'0.00',
+    bestPerRide:rides?(best.totalCents/rides/100).toFixed(2):'0.00'};
+}
+function prettyDelta(cents){return (cents>=0?'+':'−')+money(Math.abs(cents));}
+function barWidth(value,max){return max>0?Math.max(0,Math.min(100,value/max*100)).toFixed(1)+'%':'0%';}
+function loadSettings(){
+  let s={};try{s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')}catch(e){}
+  return {oldFare:clampInteger(s.oldFare,3,12,4),newFare:clampInteger(s.newFare,3,12,6),workdays:clampInteger(s.workdays,0,31,21),extraRides:clampInteger(s.extraRides,0,44,0)};
+}
+let settings=loadSettings();
+let currentResult=null;
+let toastTimer=null;
+function saveSettings(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(settings));}catch(e){}}
+function showToast(message){const toast=$('toast');toast.textContent=message;toast.classList.remove('is-hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.add('is-hidden'),2700);}
+function render(){
+  const {oldFare,newFare,workdays,extraRides}=settings;
+  const rides=workdays*2+extraRides;
+  const result=comparePlans({rides,oldFareYuan:oldFare,newFareYuan:newFare});
+  currentResult={result,rides};
+  $('oldFare').textContent=oldFare;$('newFare').textContent=newFare;
+  $('workdays').value=workdays;$('workdaysValue').textContent=workdays;
+  $('extraRides').value=extraRides;$('extraRidesValue').textContent=extraRides;
+  $('rides').textContent=rides;
+  $('bestTitle').textContent=result.best.title;
+  $('bestCostLabel').textContent=money(result.best.totalCents);
+  $('bestExplanation').textContent=result.best.isPass?`套餐使用 ${result.best.ridesUsed} 次 · ${result.best.unusedRides} 次未用 · ${result.best.extraRides} 次另外支付`:'无需购买计次票 · 直接使用同一渠道刷码乘车';
+  $('savedLabel').textContent=money(result.avoidedIncreaseCents);
+  $('deltaLabel').textContent=prettyDelta(result.increaseCents);
+  $('deltaPct').textContent=(result.increaseCents>=0?'+':'−')+Math.abs(result.increasePct).toFixed(1)+'%';
+  $('offsetPct').textContent=result.offsetPct===null?'—':result.offsetPct.toFixed(1)+'%';
+  $('oldPerRide').textContent=result.oldPerRide;
+  $('newPerRide').textContent=result.bestPerRide;
+  const maximum=Math.max(1,result.oldCents,result.newRegularCents,result.best.totalCents);
+  const bars=[
+    {label:'旧制实际支出',value:result.oldCents,color:'gray'},
+    {label:'新制普通刷码',value:result.newRegularCents,color:'orange'},
+    {label:'新制最优方案',value:result.best.totalCents,color:'green'}
+  ];
+  $('barRows').innerHTML=bars.map(b=>`<div class="chart-row"><div class="chart-row-top"><span>${b.label}</span><span class="bar-amount">${money(b.value)}</span></div><div class="bar-track"><div class="bar-fill ${b.color}" style="width:${barWidth(b.value,maximum)}"></div></div></div>`).join('');
+  $('plans').innerHTML=result.plans.map(p=>{
+    const detail=p.isPass?(p.unusedRides?`剩余 ${p.unusedRides} 次额度`:(p.extraRides?`超额 ${p.extraRides} 次另付`:'恰好用完')):'满额优惠按自然月计算';
+    return `<div class="plan-row ${p.id===result.best.id?'selected-plan':''}"><div class="plan-left"><div class="plan-name">${p.title}${p.id===result.best.id?'<span class="best-chip">最低</span>':''}</div><div class="plan-detail">${detail}</div></div><div class="plan-right"><div class="plan-cost">${money(p.totalCents)}</div><div class="plan-comparison">比旧制 ${prettyDelta(p.totalCents-result.oldCents)}</div></div></div>`;
+  }).join('');
+  document.querySelectorAll('[data-fare]').forEach(btn=>{
+    const key=btn.dataset.fare, delta=Number(btn.dataset.delta);
+    btn.disabled=settings[key]+delta<3||settings[key]+delta>12;
+  });
+}
+function update(changes){settings={...settings,...changes};render();saveSettings();}
+async function copyText(text){
+  try {if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);return true;}}catch(e){}
+  const field=document.createElement('textarea');field.value=text;field.style.cssText='position:fixed;left:-9999px;opacity:0';document.body.appendChild(field);field.select();
+  try{return document.execCommand('copy');}catch(e){return false;}finally{field.remove();}
+}
+function getSummary(){
+  const {result,rides}=currentResult;
+  return ['上海地铁通勤省钱模拟',`旧价 ¥${settings.oldFare}/次，新价 ¥${settings.newFare}/次，预计 ${rides} 次`,`旧制：${money(result.oldCents)}`,`新制普通：${money(result.newRegularCents)}`,`推荐：${result.best.title}，${money(result.best.totalCents)}`,`相对新制普通节省：${money(result.avoidedIncreaseCents)}`,`相对旧制变化：${prettyDelta(result.increaseCents)}`,'说明：自然月与计次票有效期完全重合的情景估算，不构成购票保证。'].join('\n');
+}
+document.querySelectorAll('[data-fare]').forEach(btn=>btn.addEventListener('click',()=>{
+  const k=btn.dataset.fare,delta=Number(btn.dataset.delta);
+  update({[k]:clampInteger(settings[k]+delta,3,12,settings[k])});
+}));
+$('workdays').addEventListener('input',e=>update({workdays:clampInteger(e.target.value,0,31,settings.workdays)}));
+$('extraRides').addEventListener('input',e=>update({extraRides:clampInteger(e.target.value,0,44,settings.extraRides)}));
+$('reset').addEventListener('click',()=>{update({...DEFAULT_SETTINGS});showToast('已恢复默认参数');});
+$('copySummary').addEventListener('click',async()=>showToast(await copyText(getSummary())?'测算结果已复制':'复制失败，请检查浏览器权限'));
+$('shareWeb').addEventListener('click',async()=>{
+  if(location.protocol==='file:'){showToast('请先将网页发布到线上，才能分享链接给朋友');return;}
+  try{if(navigator.share){await navigator.share({title:'通勤省钱计算器',text:'上海地铁新旧票价与计次票优化',url:location.href});return;}}catch(e){if(e.name==='AbortError')return;}
+  showToast(await copyText(location.href)?'网页链接已复制':'分享不可用，请手动复制浏览器地址');
+});
+$('openRules').addEventListener('click',()=>{ $('homePage').classList.add('is-hidden');$('rulesPage').classList.remove('is-hidden');window.scrollTo(0,0); });
+$('backHome').addEventListener('click',()=>{ $('rulesPage').classList.add('is-hidden');$('homePage').classList.remove('is-hidden');window.scrollTo(0,0); });
+render();
+</script>
+</body>
+</html>
